@@ -6,10 +6,16 @@ readme = "README.md"
 repository = "https://github.com/antoneekstrom/gumma"
 
 [dependencies]
-tokio = { version = "1", features = ["full"] }
-warp = "0.3.3"
+actix = "0.13.0"
+actix-web = "4.3.1"
 oxide-auth = "0.5.3"
-serde_json = "1.0.85"
-urlencoding = "2.1.2"
+url = "2.3.1"
+tokio = "1.26.0"
+serde = "1.0.152"
+serde_json = "1.0.93"
+env_logger = "0.9"
+# futures = "0.3"
+# oxide-auth-actix = "0.2.0"
+# reqwest = { version = "0.11.10", features = ["blocking"] }
+# serde_urlencoded = "0.7"
 # diesel = "2.0.1"
-# hyper = { version = "0.14", features = ["stream", "server", "http1", "http2", "tcp", "client"] }

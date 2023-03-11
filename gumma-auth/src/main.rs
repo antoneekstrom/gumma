@@ -1,17 +1,38 @@
-use gumma_auth::auth::{authorization_flow, access_token_flow};
-use warp::Filter;
+use actix_web::{self, web};
 
-#[tokio::main]
-async fn main() {
-    let hello = warp::path("hello").map(|| "Hello, World!");
-    let goodbye = warp::path("goodbye").map(|| "Goodbye, World!");
+#[derive(Clone, Debug)]
+enum Todo {
+    Checked(String),
+    Unchecked(String),
+}
 
-    let auth_flow_filter = warp::path("authorize").and(warp::get()).and(authorization_flow());
-    let token_flow_filter = warp::path("redirect").and(warp::get()).and(goodbye);
+#[derive(Clone, Debug)]
+struct State {
+    todos: Vec<Todo>,
+}
 
-    let auth = warp::path("auth").and(auth_flow_filter.or(token_flow_filter));
+impl State {
+    pub fn new() -> Self {
+        State { todos: Vec::new() }
+    }
+}
 
-    let api = warp::path("api").and(hello.or(goodbye).or(auth));
+async fn todos(data: web::Data<State>) -> impl actix_web::Responder {
+    actix_web::HttpResponse::Ok().body(format!("{:?}", data.todos))
+}
 
-    warp::serve(api).run(([127, 0, 0, 1], 3000)).await;
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    // Define one state that is shared between each process
+    let state = web::Data::new(State::new());
+
+    actix_web::HttpServer::new(move || {
+        let todos_service = web::scope("/todos")
+            .app_data(state.clone())
+            .route("/", web::get().to(todos));
+        actix_web::App::new().service(todos_service)
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }
