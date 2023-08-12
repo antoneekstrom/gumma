@@ -1,6 +1,6 @@
-FROM rust:1.64
+FROM rust:1.69.0-alpine3.17
 
-WORKDIR /usr/src/gumma-auth
+WORKDIR /gumma-auth
 COPY . .
 
 RUN cargo install --path .
