@@ -1,0 +1,22 @@
+name: Linting
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  eslint:
+    name: Run ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        run: npx yarn
+
+      - name: Run ESLint
+        run: npx yarn lint
+        continue-on-error: true
