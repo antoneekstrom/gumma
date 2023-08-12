@@ -1,20 +1,39 @@
 version: "3"
 
 services:
-  gumma-auth:
-    build:
-      context: ./gumma-auth
-      dockerfile: Dockerfile
-    ports:
-      - 3001:3000
-  
-  gumma-auth-db:
+  # gumma-auth:
+  #   build:
+  #     context: ./gumma-auth
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 3001:3000
+
+  # gumma-auth-db:
+  #   image: postgres:14.5-alpine3.16
+  #   environment:
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_USER: gumma
+  #     POSTGRES_DB: gumma
+  #   volumes:
+  #     - ./gumma-auth-db:/var/lib/postgresql/data
+
+  # gumma-groups:
+  #   build:
+  #     context: ./gumma-groups
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 8080:3000
+
+  gumma-groups-db:
     image: postgres:14.5-alpine3.16
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: gumma
       POSTGRES_DB: gumma
     volumes:
-      - ./gumma-auth-db:/var/lib/postgresql/data
+      - gumma-groups-db:/var/lib/postgresql/data
     ports:
       - 5432:5432
+
+volumes:
+  gumma-groups-db:
