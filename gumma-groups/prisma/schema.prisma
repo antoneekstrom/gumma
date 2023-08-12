@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator pothos {
+  provider = "prisma-pothos-types"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Person {
+  id     String  @id @default(cuid())
+  cid    String  @unique
+  groups Group[]
+}
+
+model Group {
+  id      String    @id @default(cuid())
+  type    GroupType @default(OTHER)
+  members Person[]
+}
+
+enum GroupType {
+  COMMITTEE
+  SOCIETY
+  OTHER
+}
