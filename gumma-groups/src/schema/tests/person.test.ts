@@ -1,9 +1,10 @@
 import { describe, expect, test } from "vitest"
-import { parse } from "graphql"
-import { buildHTTPExecutor } from "@graphql-tools/executor-http"
 import { createYoga } from "graphql-yoga"
-import { ZodRawShape, z } from "zod"
-import { schema } from ".."
+import { z } from "zod"
+import schema from ".."
+import { gql } from "../../graphql/__generated__"
+import { ExecutionResult, print } from "graphql"
+import { TypedDocumentNode } from "@graphql-typed-document-node/core"
 
 export const person = z.object({
   cid: z.string(),
@@ -15,23 +16,34 @@ export const person = z.object({
   ).optional()
 })
 
-// wraps as data property in zod object
-const resultObject = <T extends ZodRawShape>(result: T) => z.object({
-  data: z.object(result)
-})
-
 describe("person", async () => {
   const yoga = createYoga({
     schema,
   })
   
-  const executor = buildHTTPExecutor({
-    fetch: yoga.fetch
-  })
+  async function executeOperation<TResult, TVariables>(
+    operation: TypedDocumentNode<TResult, TVariables>,
+    ...[variables]: TVariables extends Record<string, never> ? [] : [TVariables]
+  ): Promise<ExecutionResult<TResult>> {
+    const response = await Promise.resolve(
+      yoga.fetch("http://yoga/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({
+          query: print(operation),
+          variables: variables ?? undefined
+        })
+      })
+    )
+    return await response.json()
+  }
 
   test("get groups from person", async () => {
-    const document = parse(/* GraphQL */`
-      query {
+    const document = gql(`
+      query TestGetGroupsFromPerson {
         person(cid: "antoneks") {
           cid
           id
@@ -42,24 +54,19 @@ describe("person", async () => {
       }
     `)
 
-    const schema = resultObject({ person })
-    expect(schema.parse(await executor({ document }))).toBeTypeOf("object")
+    expect(person.parse((await executeOperation(document)).data?.person)).toBeTypeOf("object")
   })
 
   test("get person by cid", async () => {
-    const document = parse(/* GraphQL */`
-      query {
+    const document = gql(`
+      query TestGetPersonByCid {
         person(cid: "antoneks") {
           id
           cid
         }
       }
     `)
-  
-    const schema = resultObject({
-      person
-    })
 
-    expect(schema.parse(await executor({ document }))).toBeTypeOf("object")
+    expect(person.parse((await executeOperation(document)).data?.person)).toBeTypeOf("object")
   })
 })

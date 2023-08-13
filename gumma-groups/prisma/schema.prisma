@@ -21,9 +21,13 @@ model Person {
 }
 
 model Group {
-  id      String    @id @default(cuid())
-  type    GroupType @default(OTHER)
-  members Person[]
+  created     DateTime  @default(now())
+  updated     DateTime  @default(now()) @updatedAt
+  id          String    @id @default(cuid())
+  type        GroupType @default(OTHER)
+  members     Person[]
+  activeStart DateTime  @default(now())
+  activeEnd   DateTime  @default(now())
 }
 
 enum GroupType {

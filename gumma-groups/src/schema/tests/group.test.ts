@@ -1,9 +1,9 @@
 import { describe, expect, test } from "vitest"
-import { parse } from "graphql"
 import { buildHTTPExecutor } from "@graphql-tools/executor-http"
 import { createYoga } from "graphql-yoga"
 import { ZodRawShape, z } from "zod"
-import { schema } from ".."
+import schema from ".."
+import { gql } from "../../graphql/__generated__"
 
 export const group = z.object({
   id: z.string().cuid().optional()
@@ -24,8 +24,8 @@ describe("group", async () => {
   })
 
   test("create group", async () => {
-    const document = parse(/* GraphQL */`
-      mutation {
+    const document = gql(`
+      mutation TestCreateGroup {
         createGroup {
           success
           group {
@@ -46,8 +46,8 @@ describe("group", async () => {
   })
 
   test("get all groups", async () => {
-    const document = parse(/* GraphQL */`
-      query {
+    const document = gql(`
+      query TestGetAllGroups {
         groups {
           id
         }

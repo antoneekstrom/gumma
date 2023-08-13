@@ -3,9 +3,19 @@ import { Group, PrismaClient } from "@prisma/client"
 import PrismaPlugin from "@pothos/plugin-prisma"
 import PrismaTypes from "@pothos/plugin-prisma/generated"
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient().$extends({
+  result: {
+    group: {
+      isActive: {
+        compute({ activeStart, activeEnd }) {
+          return Date.now() > activeStart.getTime() && Date.now() < activeEnd.getTime()
+        },
+      }
+    }
+  }
+})
 
-const builder = new SchemaBuilder<{ PrismaTypes: PrismaTypes }>({
+const builder = new SchemaBuilder<{ PrismaTypes: PrismaTypes & { Group: { Shape: Group & { isActive: boolean } } } }>({
   plugins: [PrismaPlugin],
   prisma: {
     client: prisma,
@@ -13,7 +23,7 @@ const builder = new SchemaBuilder<{ PrismaTypes: PrismaTypes }>({
     filterConnectionTotalCount: true
   },
 })
-  
+
 builder.prismaObject("Person", {
   fields: (t) => ({
     id: t.exposeID("id"),
@@ -25,7 +35,16 @@ builder.prismaObject("Person", {
 builder.prismaObject("Group", {
   fields: (t) => ({
     id: t.exposeString("id"),
-    members: t.relation("members")
+    activeStart: t.string({
+      resolve: ({ activeStart }) => activeStart.toISOString()
+    }),
+    activeEnd: t.string({
+      resolve: ({ activeEnd }) => activeEnd.toISOString()
+    }),
+    isActive: t.boolean({
+      resolve: ({ isActive }) => isActive
+    }),
+    members: t.relation("members"),
   })
 })
   
@@ -48,9 +67,35 @@ builder.queryType({
     }),
     groups: t.prismaField({
       type: ["Group"],
-      resolve: (query) => prisma.group.findMany({
-        ...query
-      })
+      args: {
+        isActive: t.arg({
+          type: "Boolean",
+          required: false
+        })
+      },
+      resolve: (query, _, { isActive }) => {
+        
+        if (isActive === undefined) {
+          return prisma.group.findMany({
+            ...query,
+            where: {}
+          })
+        }
+
+        const where = {
+          activeStart: {
+            lte: new Date(Date.now()),
+          },
+          activeEnd: {
+            gt: new Date(Date.now())
+          }
+        }
+
+        return prisma.group.findMany({
+          ...query,
+          where: isActive ? where : { NOT: where }
+        })
+      }
     })
   }),
 })
@@ -78,10 +123,22 @@ builder.mutationType({
   fields: (t) => ({
     createGroup: t.field({
       type: CreateGroup,
-      resolve: async () => {
+      args: {
+        activeStart: t.arg({
+          type: "String",
+          required: false
+        }),
+        activeEnd: t.arg({
+          type: "String",
+          required: false
+        })
+      },
+      resolve: async (_, { activeStart, activeEnd }) => {
         const result = await prisma.group.create({
           data: {
-            type: "COMMITTEE"
+            type: "COMMITTEE",
+            activeStart: new Date(activeStart!),
+            activeEnd: new Date(activeEnd!),
           }
         })
         return {
@@ -93,4 +150,4 @@ builder.mutationType({
   })
 })
 
-export const schema = builder.toSchema()
+export default builder.toSchema()
