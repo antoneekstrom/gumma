@@ -5,3 +5,4 @@ dist
 build
 target
 migrations
+__generated__
