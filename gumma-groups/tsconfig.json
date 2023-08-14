@@ -5,7 +5,8 @@
     "target": "ES2020",
     "isolatedModules": true,
     "strict": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "noImplicitAny": true
   },
   "exclude": [
     "node_modules",
