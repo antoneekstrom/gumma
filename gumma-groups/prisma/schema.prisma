@@ -15,23 +15,49 @@ datasource db {
 }
 
 model Person {
-  id     String  @id @default(cuid())
-  cid    String  @unique
-  groups Group[]
+  id           String    @id @default(cuid())
+  cid          String    @unique
+  firsName     String?
+  lastName     String?
+  nickName     String?
+  lastNickName String?
+  middleName   String?
+  birthday     DateTime?
+  groups       Member[]
+}
+
+model Member {
+  personId     String
+  groupId      String
+  person       Person   @relation(fields: [personId], references: [id])
+  group        Group    @relation(fields: [groupId], references: [id])
+  position     Position @default(MEMBER)
+  positionName String?
+
+  @@id([personId, groupId])
 }
 
 model Group {
   created     DateTime  @default(now())
   updated     DateTime  @default(now()) @updatedAt
   id          String    @id @default(cuid())
+  name        String?
   type        GroupType @default(OTHER)
-  members     Person[]
   activeStart DateTime  @default(now())
   activeEnd   DateTime  @default(now())
+  members     Member[]
 }
 
 enum GroupType {
   COMMITTEE
   SOCIETY
   OTHER
+}
+
+enum Position {
+  TREASURER
+  CHAIRMAN
+  VICE_CHAIRMAN
+  PR
+  MEMBER
 }
