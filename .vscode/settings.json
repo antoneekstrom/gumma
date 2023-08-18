@@ -1,0 +1,20 @@
+{
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    "eslint.format.enable": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "files.eol": "\n",
+    "files.associations": {
+        "*.json": "jsonc"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[prisma]": {
+        "editor.defaultFormatter": "Prisma.prisma"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "testing.automaticallyOpenPeekView": "never",
+}

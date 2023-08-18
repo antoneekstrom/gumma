@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator pothos {
+  provider = "prisma-pothos-types"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Person {
+  id           String    @id @default(cuid())
+  cid          String    @unique
+  firsName     String?
+  lastName     String?
+  nickName     String?
+  lastNickName String?
+  middleName   String?
+  birthday     DateTime?
+  groups       Member[]
+}
+
+model Member {
+  personId     String
+  groupId      String
+  person       Person   @relation(fields: [personId], references: [id])
+  group        Group    @relation(fields: [groupId], references: [id])
+  position     Position @default(MEMBER)
+  positionName String?
+
+  @@id([personId, groupId])
+}
+
+model Group {
+  created     DateTime  @default(now())
+  updated     DateTime  @default(now()) @updatedAt
+  id          String    @id @default(cuid())
+  name        String?
+  type        GroupType @default(OTHER)
+  activeStart DateTime  @default(now())
+  activeEnd   DateTime  @default(now())
+  members     Member[]
+}
+
+enum GroupType {
+  COMMITTEE
+  SOCIETY
+  OTHER
+}
+
+enum Position {
+  TREASURER
+  CHAIRMAN
+  VICE_CHAIRMAN
+  PR
+  MEMBER
+}

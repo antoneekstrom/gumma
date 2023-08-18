@@ -1,0 +1,24 @@
+[package]
+name = "gumma-auth"
+version = "0.1.0"
+edition = "2021"
+readme = "README.md"
+repository = "https://github.com/antoneekstrom/gumma"
+
+[dependencies]
+actix = "0.13.0"
+actix-web = "4.3.1"
+oxide-auth = "0.5.3"
+url = "2.3.1"
+tokio = "1.26.0"
+serde = "1.0.152"
+serde_json = "1.0.93"
+env_logger = "0.9"
+serde_urlencoded = "0.7"
+futures = "0.3"
+html = "0.5.2"
+base64 = "0.13.0"
+reqwest = { version = "0.11.18", features = ["blocking"] }
+async-trait = "0.1.51"
+# oxide-auth-actix = "0.2.0"
+# diesel = "2.0.1"
