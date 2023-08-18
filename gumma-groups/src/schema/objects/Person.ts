@@ -16,7 +16,7 @@ const Person = builder.prismaObject("Person", {
 builder.queryField(
   "person",
   (t) => t.prismaField({
-    type: "Person",
+    type: Person,
     args: {
       cid: t.arg({
         type: "String",
@@ -35,7 +35,7 @@ builder.queryField(
 builder.queryField(
   "people",
   (t) => t.prismaConnection({
-    type: "Person",
+    type: Person,
     cursor: "id",
     resolve: async (query) => prisma.person.findMany({ ...query })
   })
