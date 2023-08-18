@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "start",
+			"path": "gumma-groups",
+			"problemMatcher": [],
+			"label": "npm: start - gumma-groups",
+			"detail": "vite-node --watch src/index.ts"
+		},
+		{
+			"type": "npm",
+			"script": "codegen:watch",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: codegen:watch",
+			"detail": "graphql-codegen --watch --config codegen.ts"
+		}
+	]
+}
